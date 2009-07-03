@@ -1,0 +1,21 @@
+gitify_ps1() {
+if [[ -z $ORIGINAL_PS1 ]]; then
+  ORIGINAL_PS1=`echo "$PS1" | sed -e 's/ $//'`
+fi
+GIT_ORIGIN=`git remote -v 2>&1 | grep origin | awk '{print $2}' | sed -e 's/.git$//'`
+GIT_BRANCH=`git branch 2>&1 | grep '*' | awk '{print $2}'`
+if [[ -n $GIT_BRANCH ]]; then
+  if [[ -z $PRE_BRANCH ]]; then
+    PRE_BRANCH=`echo $ORIGINAL_PS1 | awk '{print substr($0,1,length($0)-1)}'`
+    PST_BRANCH=`echo $ORIGINAL_PS1 | awk '{print substr($0,length($0),1)}'`
+    if [[ `echo $PRE_BRANCH | awk '{print substr($0,length($0),1)}'` == "\\" ]]; then
+      PST_BRANCH=\\$PST_BRANCH
+      PRE_BRANCH=`echo $PRE_BRANCH | awk '{print substr($0,1,length($0)-1)}'`
+    fi
+  fi
+  PS1="$PRE_BRANCH($GIT_BRANCH)$PST_BRANCH "
+else
+  PS1=$ORIGINAL_PS1' '
+fi
+$*
+}
